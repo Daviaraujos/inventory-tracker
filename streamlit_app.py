@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-
 # Título da página e configuração inicial
 st.set_page_config(page_title="Análise de vendas", page_icon=":bar_chart:")
 
@@ -33,41 +32,30 @@ try:
     respostas = df['Respondeu as msgns']
     aceites = df['Aceitou']
    
-    contagem_leads = leads.count() # leads
-    contagem_respostas = respostas.count() # Leads que responderam
-    contagem_atendem = atendem.count() # Atendem aos requisitos
-    contagem_aceites = aceites.count() # Aceites
-    contagem_assinado = assinado.count() # Assinaram
+    # Contagens
+    contagem_leads = leads.count()  # Total de leads
+    contagem_respostas = respostas.count()  # Leads que responderam
+    contagem_atendem = atendem.count()  # Atendem aos requisitos
+    contagem_aceites = aceites.count()  # Aceitaram
+    contagem_assinado = assinado.count()  # Assinaram
 
-    # Exibir contagens de atendem e assinados
-    # st.write(f"Total que atendem aos requisitos: {contagem_atendem.sum()}")
-    # st.write(f"Total que assinaram: {contagem_assinado.sum()}")
-
-    # Criar listas de dados para gráficos
-    dados = {
-        'Aptos': contagem_atendem.sum(),
-        'Assinaram': contagem_assinado.sum()
-    }
+    # Criar DataFrame para exibir na tabela de conversão
     Tabela_dados = {
-        'Aptos': [contagem_atendem.sum()],
-        'Assinaram': [contagem_assinado.sum()]
+        'Aptos': [contagem_atendem],
+        'Assinaram': [contagem_assinado]
     }
-    contagem_leads = {
-        'Indíce': ['Leads', 'Responderam', 'Aptos', 'Aceitaram', 'Assinaram'],
-        'Colunas':[[contagem_leads.sum()],[contagem_respostas.sum()],[contagem_atendem.sum()],[contagem_aceites.sum()],[contagem_assinado.sum()]]
-    } 
- 
-   
     df_tabela_dados = pd.DataFrame(Tabela_dados)
     st.subheader('Tabela e gráfico de conversão')
     st.table(df_tabela_dados)
 
-     
     # Gerar gráfico de pizza
     fig, ax = plt.subplots(figsize=(3, 3))
+    dados = {
+        'Aptos': contagem_atendem,
+        'Assinaram': contagem_assinado
+    }
     ax.pie(dados.values(), labels=dados.keys(), autopct='%1.1f%%', startangle=90)
     ax.axis('equal')  # Assegura que o gráfico de pizza será circular
-
     st.pyplot(fig)  # Exibe o gráfico no Streamlit
 
     # Carregar os dados da aba específica
@@ -78,7 +66,6 @@ try:
         'Data':df.iloc[5, 17],
         'Assinados hoje': [df.iloc[5, 18]], 
         'Pré-contratos': [df.iloc[5, 19]],
-        'Contratos': [df.iloc[5, 20]],
         'Contratos': [df.iloc[5, 20]]
     }
     
@@ -87,20 +74,20 @@ try:
     st.subheader('Resumo do dia')
     st.table(df_tabela)
 
+    # Funil em resumo
     st.subheader('Funil em resumo')
-    st.table(contagem_leads)
 
+    # Criar dados corretos para o gráfico de funil
     data_funel = {
-      'Indíce': ['Leads', 'Responderam', 'Aptos', 'Aceitaram', 'Assinaram'],
-      'Colunas':[contagem_leads,contagem_respostas,contagem_atendem,contagem_aceites,contagem_assinado]
+        'Etapas': ['Leads', 'Responderam', 'Aptos', 'Aceitaram', 'Assinaram'],
+        'Valores': [contagem_leads, contagem_respostas, contagem_atendem, contagem_aceites, contagem_assinado]
     }
 
     # Criando o gráfico de funil
-    fig_funnel = px.funnel(data_funel, x='Indíce', y='Colunas', title='Funil de Vendas')
-
+    fig_funnel = px.funnel(data_funel, x='Valores', y='Etapas', title='Funil de Vendas')
 
     # Exibindo no Streamlit
-    st.plotly_chart(fig_funnel)   
- 
+    st.plotly_chart(fig_funnel)
+
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
