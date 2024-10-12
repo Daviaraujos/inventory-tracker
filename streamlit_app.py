@@ -1,7 +1,7 @@
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 
 # Título da página e configuração inicial
@@ -29,15 +29,15 @@ try:
     # Métrica de qualificados e os que assinaram
     atendem = df['Atende aos requisitos']
     assinado = df['Data da assinatura']
-    leads = df['Nome']
+    leads = df['Number_leads']
     respostas = df['Respondeu as msgns']
     aceites = df['Aceitou']
    
-    contagem_leads = leads.value_counts() # leads
-    contagem_respostas = respostas.value_counts() # Leads que responderam
-    contagem_atendem = atendem.value_counts() # Atendem aos requisitos
-    contagem_aceites = aceites.value_counts() # Aceites
-    contagem_assinado = assinado.value_counts() # Assinaram
+    contagem_leads = leads.count() # leads
+    contagem_respostas = respostas.count() # Leads que responderam
+    contagem_atendem = atendem.count() # Atendem aos requisitos
+    contagem_aceites = aceites.count() # Aceites
+    contagem_assinado = assinado.count() # Assinaram
 
     # Exibir contagens de atendem e assinados
     # st.write(f"Total que atendem aos requisitos: {contagem_atendem.sum()}")
@@ -53,7 +53,7 @@ try:
         'Assinaram': [contagem_assinado.sum()]
     }
     contagem_leads = {
-        'Indíce': ['Leads', 'REsponderam', 'Aptos', 'Aceitaram', 'Assinaram'],
+        'Indíce': ['Leads', 'Responderam', 'Aptos', 'Aceitaram', 'Assinaram'],
         'Colunas':[[contagem_leads.sum()],[contagem_respostas.sum()],[contagem_atendem.sum()],[contagem_aceites.sum()],[contagem_assinado.sum()]]
     } 
  
@@ -89,6 +89,17 @@ try:
 
     st.subheader('Funil em resumo')
     st.table(contagem_leads)
-    
+
+    data_funel = {
+      'Indíce': ['Leads', 'Responderam', 'Aptos', 'Aceitaram', 'Assinaram'],
+      'Colunas':[contagem_leads,contagem_respostas,contagem_atendem,contagem_aceites,contagem_assinado]
+    }
+
+    # Criando o gráfico de funil
+    fig_funnel = px.funnel(data_funel, x='Colunas', y='Indíce', title='Funil de Vendas')
+
+    # Exibindo no Streamlit
+    st.plotly_chart(fig_funnel)   
+ 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
