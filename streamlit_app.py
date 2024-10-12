@@ -96,7 +96,8 @@ try:
     }
 
     # Criando o gráfico de funil
-    fig_funnel = px.funnel(data_funel, x='Colunas', y='Indíce', title='Funil de Vendas')
+    fig_funnel = px.funnel(data_funel, x='Indíce', y='Colunas', title='Funil de Vendas')
+
 
     # Exibindo no Streamlit
     st.plotly_chart(fig_funnel)   
