@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import requests
 
-# Título da página e configuração inicia
+# Título da página e configuração inicial
 st.set_page_config(page_title="Análise de vendas", page_icon=":bar_chart:")
 
 # Título
