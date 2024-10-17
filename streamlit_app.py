@@ -22,8 +22,8 @@ try:
     df = pd.read_excel(xlsx_url, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
 
     # Exibir os primeiros registros do DataFrame 
-    st.write("Visualizando os primeiros registros da planilha:")
-    st.dataframe(df.head(15))
+    st.write("Visualizando os registros mais recentes da planilha:")
+    st.dataframe(df.tail(15))
 
     # Métrica de qualificados e os que assinaram
     atendem = df['Atende aos requisitos']
@@ -88,6 +88,13 @@ try:
 
     # Exibindo no Streamlit
     st.plotly_chart(fig_funnel)
+
+      # Carregar os dados da de dados gerais
+    df = pd.read_excel(xlsx_url, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
+
+    # Puxar dados das assinaturas
+    st.write("últimas assinaturas")
+    ultimas_assinaturas = st.dataframe(df['Data da assinatura'].tail(10))
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
