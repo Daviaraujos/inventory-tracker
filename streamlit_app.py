@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
+import requests
 
 # Título da página e configuração inicia
 st.set_page_config(page_title="Análise de vendas", page_icon=":bar_chart:")
@@ -10,7 +11,7 @@ st.set_page_config(page_title="Análise de vendas", page_icon=":bar_chart:")
 st.title('Análise de vendas')
 
 # URL da planilha
-xlsx_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx'
+xlsx_url = requests.get('https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx')
 
 # Carregar as abas da planilha
 st.subheader("Carregando dados da planilha...")
