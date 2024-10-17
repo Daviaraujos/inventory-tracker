@@ -13,7 +13,7 @@ st.title('Análise de vendas')
 xlsx_url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx'
 
 # Carregar as abas da planilha
-st.write("Carregando dados da planilha...")
+st.subheader("Carregando dados da planilha...")
 
 try:
     xls = pd.ExcelFile(xlsx_url)
