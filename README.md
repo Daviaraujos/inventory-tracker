@@ -19,4 +19,9 @@ this uses a simple SQLite database, but you can easily replace it with whatever 
    $ streamlit run streamlit_app.py
    ```
 
-pip install streamlit-autorefresh
+2. Run the app
+
+   ```
+   $ pip install streamlit-autorefresh
+
+   ```
