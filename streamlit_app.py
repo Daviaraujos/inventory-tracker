@@ -3,24 +3,30 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import requests
+from streamlit_autorefresh import st_autorefresh  # Importação do autorefresh
 
-# Título da página e configuração inicial
+# Configuração da página
 st.set_page_config(page_title="Análise de vendas", page_icon=":bar_chart:")
+
+# Atualização automática a cada 15 segundos
+st_autorefresh(interval=15000, key="data_refresh")
 
 # Título
 st.title('Análise de vendas')
 
 # URL da planilha
-xlsx_url = requests.get('https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx')
-
-# Carregar as abas da planilha
-st.subheader("Carregando dados da planilha...")
-
 try:
-    xls = pd.ExcelFile(xlsx_url)
+    response = requests.get('https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx')
+    response.raise_for_status()  # Verifica se a requisição foi bem-sucedida
 
-    # Carregar os dados da de dados gerais
-    df = pd.read_excel(xlsx_url, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
+    # Carregar as abas da planilha
+    st.subheader("Carregando dados da planilha...")
+
+    # Ler o conteúdo do arquivo Excel a partir dos bytes recebidos
+    xls = pd.ExcelFile(response.content)
+
+    # Carregar os dados gerais
+    df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
 
     # Exibir os primeiros registros do DataFrame 
     st.write("Visualizando os registros mais recentes da planilha:")
@@ -60,14 +66,14 @@ try:
     st.pyplot(fig)  # Exibe o gráfico no Streamlit
 
     # Carregar os dados da aba específica
-    df = pd.read_excel(xlsx_url, sheet_name='PAINEL DE SETEMBRO')
+    df_painel = pd.read_excel(xls, sheet_name='PAINEL DE SETEMBRO')
 
     # Dados gerais
     dados_gerais = {
-        'Data':df.iloc[5, 17],
-        'Assinados hoje': [df.iloc[5, 18]], 
-        'Pré-contratos': [df.iloc[5, 19]],
-        'Contratos': [df.iloc[5, 20]]
+        'Data': df_painel.iloc[5, 17],
+        'Assinados hoje': [df_painel.iloc[5, 18]], 
+        'Pré-contratos': [df_painel.iloc[5, 19]],
+        'Contratos': [df_painel.iloc[5, 20]]
     }
     
     df_tabela = pd.DataFrame(dados_gerais)
@@ -90,12 +96,8 @@ try:
     # Exibindo no Streamlit
     st.plotly_chart(fig_funnel)
 
-      # Carregar os dados da de dados gerais
-    df = pd.read_excel(xlsx_url, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
-
     # Puxar dados das assinaturas
-    st.write("últimas assinaturas")
-    ultimas_assinaturas = st.dataframe(df['Data da assinatura'].tail(10))
+    st.write("Últimas assinaturas")
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
