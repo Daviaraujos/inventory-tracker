@@ -1,4 +1,3 @@
-pip install streamlit-autorefresh
 
 
 import streamlit as st
