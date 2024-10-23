@@ -22,6 +22,12 @@ try:
     # Ler o conteúdo do arquivo Excel a partir dos bytes recebidos
     xls = pd.ExcelFile(response.content)
 
+    # Carregar os dados gerais
+    df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
+
+    # Certificar-se de que 'Data da assinatura' está no formato datetime
+    df['Data da assinatura'] = pd.to_datetime(df['Data da assinatura'], errors='coerce')
+
     # Barra de pesquisa para buscar por nome do consultor
     search_term = st.text_input('Digite o nome do consultor para buscar:')
 
@@ -34,14 +40,7 @@ try:
         if df_filtered.empty:
             st.warning(f"Nenhum resultado encontrado para '{search_term}'.")
 
-
-    # Carregar os dados gerais
-    df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
-
-    # Certificar-se de que 'Data da assinatura' está no formato datetime
-    df['Data da assinatura'] = pd.to_datetime(df['Data da assinatura'], errors='coerce')
-
-    # Exibir os primeiros registros do DataFrame 
+  # Exibir os primeiros registros do DataFrame 
     st.write("Visualizando os registros mais recentes da planilha:")
     st.dataframe(df.tail(30))
 
