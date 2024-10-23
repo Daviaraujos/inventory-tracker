@@ -1,11 +1,9 @@
-
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 import requests
-from streamlit_autorefresh import st_autorefresh  # Importação do autorefresh
+from streamlit_autorefresh import st_autorefresh
 
 # Configuração da página
 st.set_page_config(page_title="Análise de vendas", page_icon=":bar_chart:")
@@ -21,18 +19,31 @@ try:
     response = requests.get('https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx')
     response.raise_for_status()  # Verifica se a requisição foi bem-sucedida
 
-    # Carregar as abas da planilha
-    st.subheader("Carregando dados da planilha...")
-
     # Ler o conteúdo do arquivo Excel a partir dos bytes recebidos
     xls = pd.ExcelFile(response.content)
+
+    # Barra de pesquisa para buscar por nome do consultor
+    search_term = st.text_input('Digite o nome do consultor para buscar:')
+
+    # Verifica se o usuário digitou algo na barra de pesquisa
+    if search_term:
+        df_filtered = df[df['Atende aos requisitos'].str.contains(search_term, case=False, na=False)]
+        st.write(f"Resultados da busca para '{search_term}':")
+        st.dataframe(df_filtered)
+
+        if df_filtered.empty:
+            st.warning(f"Nenhum resultado encontrado para '{search_term}'.")
+
 
     # Carregar os dados gerais
     df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
 
+    # Certificar-se de que 'Data da assinatura' está no formato datetime
+    df['Data da assinatura'] = pd.to_datetime(df['Data da assinatura'], errors='coerce')
+
     # Exibir os primeiros registros do DataFrame 
     st.write("Visualizando os registros mais recentes da planilha:")
-    st.dataframe(df.tail(15))
+    st.dataframe(df.tail(30))
 
     # Métrica de qualificados e os que assinaram
     atendem = df['Atende aos requisitos']
@@ -67,39 +78,15 @@ try:
     ax.axis('equal')  # Assegura que o gráfico de pizza será circular
     st.pyplot(fig)  # Exibe o gráfico no Streamlit
 
-    # Carregar os dados da aba específica
-    df_painel = pd.read_excel(xls, sheet_name='PAINEL DE SETEMBRO')
-
-    # Dados gerais
-    dados_gerais = {
-        'Data': df_painel.iloc[5, 17],
-        'Assinados hoje': [df_painel.iloc[5, 18]], 
-        'Pré-contratos': [df_painel.iloc[5, 19]],
-        'Contratos': [df_painel.iloc[5, 20]]
-    }
-    
-    df_tabela = pd.DataFrame(dados_gerais)
-    
-    st.subheader('Resumo do dia')
-    st.table(df_tabela)
-
-    # Funil em resumo
+    # Funil de vendas
     st.subheader('Funil em resumo')
-
-    # Criar dados corretos para o gráfico de funil
     data_funel = {
         'Etapas': ['Leads', 'Responderam', 'Aptos', 'Aceitaram', 'Assinaram'],
         'Valores': [contagem_leads, contagem_respostas, contagem_atendem, contagem_aceites, contagem_assinado]
     }
 
-    # Criando o gráfico de funil
     fig_funnel = px.funnel(data_funel, x='Valores', y='Etapas', title='Funil de Vendas')
-
-    # Exibindo no Streamlit
     st.plotly_chart(fig_funnel)
-
-    # Puxar dados das assinaturas
-    st.write("Últimas assinaturas")
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
