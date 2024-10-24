@@ -25,6 +25,9 @@ try:
     # Carregar os dados gerais
     df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
 
+    # Verificar as colunas disponíveis no DataFrame
+    st.write("Colunas disponíveis no DataFrame:", df.columns.tolist())
+
     # Certificar-se de que 'Data da assinatura' está no formato datetime
     df['Data da assinatura'] = pd.to_datetime(df['Data da assinatura'], errors='coerce')
 
@@ -33,14 +36,14 @@ try:
 
     # Verifica se o usuário digitou algo na barra de pesquisa
     if search_term:
-        df_filtered = df[df['Atende aos requisitos'].str.contains(search_term, case=False, na=False)]
+        df_filtered = df[df['Consultor'].str.contains(search_term, case=False, na=False)]
         st.write(f"Resultados da busca para '{search_term}':")
         st.dataframe(df_filtered)
 
         if df_filtered.empty:
             st.warning(f"Nenhum resultado encontrado para '{search_term}'.")
 
-  # Exibir os primeiros registros do DataFrame 
+    # Exibir os primeiros registros do DataFrame 
     st.write("Visualizando os registros mais recentes da planilha:")
     st.dataframe(df.tail(30))
 
@@ -86,6 +89,19 @@ try:
 
     fig_funnel = px.funnel(data_funel, x='Valores', y='Etapas', title='Funil de Vendas')
     st.plotly_chart(fig_funnel)
+
+    # Converter a coluna 'Aceitou' para valores numéricos: 1 para 'Sim', 0 para 'Não'
+    df['Aceitaram'] = df['Aceitou'].apply(lambda x: 1 if x == 'sim' or 'SIM' else 0)
+
+    # Agrupar por consultor e somar as assinaturas
+    vendas_por_consultor = df.groupby('Consultor')['Aceitaram'].sum().reset_index()
+
+    # Renomear a coluna para melhor clareza
+    vendas_por_consultor.rename(columns={'Aceitaram': 'Total de Assinaturas'}, inplace=True)
+
+    # Exibir tabela de consultores e suas respectivas vendas
+    st.subheader('Total de assinaturas por consultor')
+    st.table(vendas_por_consultor)
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
