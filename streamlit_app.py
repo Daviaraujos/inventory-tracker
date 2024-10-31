@@ -74,4 +74,3 @@ try:
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
-    
