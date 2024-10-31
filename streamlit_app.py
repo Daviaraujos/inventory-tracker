@@ -1,5 +1,6 @@
+###
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 import plotly.express as px
 import streamlit as st
 import requests  # Adicionado aqui
@@ -9,18 +10,17 @@ from streamlit_autorefresh import st_autorefresh
 st.set_page_config(page_title="Análise de Vendas", page_icon=":bar_chart:")
 
 # Atualização automática a cada 15 segundos
-st_autorefresh(interval=15000, key="data_refresh")
+st_autorefresh(interval=5000, key="data_refresh")
 
 # Título do dashboard
 st.title('Análise de Vendas')
 
 # Carregar dados da planilha Excel (substitua pelo seu arquivo)
-# URL da planilha
 try:
     response = requests.get('https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx')
     response.raise_for_status()
     xls = pd.ExcelFile(response.content)
-    df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL 1')
+    df = pd.read_excel(xls, sheet_name='Copia de DADOS GERAIS COMERCIAL 1')
 
     # Converter colunas de datas e limpar dados
     df['Data da assinatura'] = pd.to_datetime(df['Data da assinatura'], errors='coerce')
@@ -29,7 +29,7 @@ try:
     total_leads = df['Number_leads'].count()
     leads_qualificados = df[df['Atende aos requisitos'] == 'Sim']['Number_leads'].count()
     leads_respondidos = df[df['Respondeu as msgns'] == 'Sim']['Number_leads'].count()
-    propostas_aceitas = df[df['Aceitou'] == 'Sim']['Number_leads'].count()
+    propostas_aceitas = df[df['Aceitou'] == 'SIM']['Number_leads'].count()
     assinaturas_finalizadas = df['Data da assinatura'].notnull().sum()
     
     taxa_conversao = (assinaturas_finalizadas / total_leads) * 100 if total_leads else 0
@@ -65,7 +65,7 @@ try:
     st.plotly_chart(fig_funnel)
 
     # Análise de tempo médio de fechamento
-    df['Tempo de Fechamento'] = (df['Data da assinatura'] - df['Data do primeiro contato']).dt.days
+    df['Tempo de Fechamento'] = (df['Data da assinatura'] - df['Data da mensagem']).dt.days
     tempo_medio_fechamento = df['Tempo de Fechamento'].mean()
     st.metric("Tempo Médio de Fechamento (dias)", f"{tempo_medio_fechamento:.2f}" if not pd.isna(tempo_medio_fechamento) else "N/A")
 
@@ -75,3 +75,4 @@ try:
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
+###
