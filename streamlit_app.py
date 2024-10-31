@@ -17,7 +17,7 @@ st.title('Análise de Vendas')
 # Carregar dados da planilha Excel (substitua pelo seu arquivo)
 # URL da planilha
 try:
-    response = requests.get('URL_DO_ARQUIVO_AQUI')
+    response = requests.get('https://docs.google.com/spreadsheets/d/e/2PACX-1vQt8EOEnxeGbcvhHIz_5ubSFJk9G8ids7B-xW8OpsViI3rQVhMdtKFuXl_Lmrnb8h0jWnaoL0cQK2rR/pub?output=xlsx')
     response.raise_for_status()
     xls = pd.ExcelFile(response.content)
     df = pd.read_excel(xls, sheet_name='Cópia de DADOS GERAIS COMERCIAL')
