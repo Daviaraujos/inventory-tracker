@@ -1,4 +1,3 @@
-###
 import pandas as pd
 import matplotlib.pyplot as plt 
 import plotly.express as px
@@ -75,4 +74,3 @@ try:
 
 except Exception as e:
     st.error(f"Erro ao carregar a planilha: {e}")
-###
